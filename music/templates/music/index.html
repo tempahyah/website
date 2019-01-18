@@ -1,81 +1,62 @@
-<!-- Loads the path to your static files -->
-{% load static %}
+{% extends 'music/base.html' %}
+{% block albums_active %} active {% endblock %}
 
-<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
-<link href="htpps://fonts.googleapis.com?family=Satisfy" rel="stylesheet" type="text/css">
-<link rel="stylesheet" type="text/css" href="{% static 'music/style.css' %}"/>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
-<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+{% block body %}
+<div class="albums-container container-fluid">
+    <!-- Albums -->
+    <div class="row>">
+        <div class="col-sm-12">
+            <h3></h3>
+            {% if albums %}
+                {% for album in albums %}
+                    <div class="col-sm-4 col-lg-2">
+                        <div class="thumbnail">
+                            <a href="{% url 'music:detail' album.id %}">
+                                <img src="{{ album.album_logo.url }}" class="img-responsive">
+                            </a>
+                            <div class="caption">
+                                <h2>{{ album.album_title }}</h2>
+                                <h4>{{ album.artist }}</h4>
+
+                                <!-- View Details -->
+                                <a href="{% url 'music:detail' album.id %}" class="btn btn-primary btn-sm">View details</a>
 
 
-<nav class="navbar navbar-inverse">
-    <div class="container-fluid">
+                                <!-- Delete Album -->
+                                <form action="{% url 'music:delete_album' album.id %}" method="post" style="display: inline;">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="album_id"  value="{{ album.id }}">
+                                    <button type="submit" class="btn btn-default btn-sm">
+                                        <span class="glyphicon glyphicon-trash"></span>
+                                    </button>
+                                </form>
 
-        <!-- Header -->
-        <div class="navbar-header">
-            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#topNavBar">
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
 
-            </button>
-            <a class="navbar-brand" href="{% url 'music:index' %}">Forex Express</a>
-        </div>
+                                <!-- Favorite Album -->
+                                <a href="{% url 'music:favorite_album' album.id %}" class="btn btn-default btn-sm btn-favorite" role="button">
+                                    <span class="glyphicon glyphicon-star {% if album.is_favorite %}active{% endif %}"></span>
+                                </a>
 
-        <!-- Items -->
-        <div class="collapse navbar-collapse" id="topNavBar">
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="col-sm-12">
+                    <br>
+                    <!---->
+                    <a href="{% url 'music:album-add' %}">
+                        <button type="button" class="btn-success">
+                            <span class="glyphicon glyphicon-plus"></span>&nbsp; Add Album
+                        </button>
 
-            <ul class="nav navbar-nav">
-                <li class="active">
-                    <a href="{% url 'music:index' %}">
-                        <span class="glyphicon glyphicon-cd" aria-hidden="true"></span>&nbsp;
-                        Albums
                     </a>
-                </li>
-                <li class="">
-                    <a href="#">
-                        <span class="glyphicon glyphicon-music" aria-hidden="true"></span>&nbsp;
-                        Songs
-                    </a>
-                </li>
-
-            </ul>
-
-            <form class="navbar-form navbar-left" role="search" method="get" action="#">
-                <div class="form-group">
-                    <input type="text" class="form-control" name="q" value="">
-
                 </div>
-                <button type="submit" class="btn btn-default" >Search</button>
-
-            </form>
-
-            <ul class="nav navbar-nav navbar-right">
-                <li class="">
-                    <a href="#">
-                        <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>&nbsp; Add Album
-                    </a>
-                </li>
-
-                <li class="">
-                    <a href="#">
-                        <span class="glyphicon glyphicon-log-out" aria-hidden="true"></span>&nbsp; Logout
-                    </a>
-                </li>
-
-            </ul>
+            {% cycle '' '' '' '' '' '<div class="clearfix visible-lg"></div>' %}
+            {% endif %}
         </div>
-
     </div>
-</nav>
-{% if all_albums %}
-    <h3>Here are all my albums</h3>
-    <ul>
-        {% for album in all_albums %}
-        <li><a href="{% url 'music:detail' album.id %}">{{album.album_title}}</a></li>
-        {% endfor %}
-    </ul>
-{% else %}
-    <h3>You don't have any Albums Hoss</h3>
 
-{% endif %}
+</div>
+
+{% endblock %}
